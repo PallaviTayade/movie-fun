@@ -24,14 +24,14 @@ public class SmokeTest {
         assertThat(setupPage, containsString("I-Spy"));
         assertThat(setupPage, containsString("The Royal Tenenbaums"));
 
-        String movieFunPage = restTemplate.getForObject(url("/moviefun"), String.class);
+        String movieFunPage = restTemplate.getForObject(url("moviefun"), String.class);
 
         assertThat(movieFunPage, containsString("Wedding Crashers"));
         assertThat(movieFunPage, containsString("David Dobkin"));
     }
 
     private String url(String path) {
-        String baseUrl = "http://localhost:8080/moviefun";
+        String baseUrl = "http://localhost:8080";
         String envUrl = System.getenv("MOVIE_FUN_URL");
 
         if (envUrl != null && !envUrl.isEmpty()) {
