@@ -1,6 +1,11 @@
 package org.superbiz.moviefun.albums;
 
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.services.s3.AmazonS3Client;
 import org.apache.tika.io.IOUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -9,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.superbiz.moviefun.blobstore.Blob;
 import org.superbiz.moviefun.blobstore.BlobStore;
+import org.superbiz.moviefun.blobstore.S3Store;
+import org.superbiz.moviefun.blobstore.ServiceCredentials;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -78,4 +85,5 @@ public class AlbumsController {
         InputStream resourceAsStream = getClass().getClassLoader().getResourceAsStream("default-cover.jpg");
         return new Blob("default cover", resourceAsStream, "image/jpg");
     }
+
 }
