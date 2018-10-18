@@ -18,6 +18,7 @@ package org.superbiz.moviefun;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.support.TransactionOperations;
 import org.superbiz.moviefun.movies.Movie;
 import org.superbiz.moviefun.movies.MoviesBean;
 
@@ -38,6 +39,11 @@ public class ActionServlet extends HttpServlet {
     private static final long serialVersionUID = -5832176047021911038L;
 
     public static int PAGE_SIZE = 5;
+    private final TransactionOperations moviesTxOps;
+
+    public ActionServlet(TransactionOperations moviesTxOps) {
+        this.moviesTxOps = moviesTxOps;
+    }
 
     @EJB
     private MoviesBean moviesBean;
@@ -65,7 +71,10 @@ public class ActionServlet extends HttpServlet {
 
             Movie movie = new Movie(title, director, genre, rating, year);
 
-            moviesBean.addMovie(movie);
+            Object execute = moviesTxOps.execute(transactionStatus -> {
+                moviesBean.addMovie(movie);
+                return null;
+            });
             response.sendRedirect("moviefun");
             return;
 

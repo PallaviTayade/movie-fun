@@ -1,6 +1,7 @@
 package org.superbiz.moviefun;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.support.TransactionOperations;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.superbiz.moviefun.albums.Album;
 import org.superbiz.moviefun.albums.AlbumFixtures;
@@ -18,12 +19,21 @@ public class HomeController {
     private final AlbumsBean albumsBean;
     private final MovieFixtures movieFixtures;
     private final AlbumFixtures albumFixtures;
+    private final TransactionOperations moviesTxOps;
+    private final TransactionOperations albumsTxOps;
 
-    public HomeController(MoviesBean moviesBean, AlbumsBean albumsBean, MovieFixtures movieFixtures, AlbumFixtures albumFixtures) {
+    public HomeController(MoviesBean moviesBean,
+                          AlbumsBean albumsBean,
+                          MovieFixtures movieFixtures,
+                          AlbumFixtures albumFixtures,
+                          TransactionOperations moviesTxOps,
+                          TransactionOperations albumsTxOps) {
         this.moviesBean = moviesBean;
         this.albumsBean = albumsBean;
         this.movieFixtures = movieFixtures;
         this.albumFixtures = albumFixtures;
+        this.moviesTxOps = moviesTxOps;
+        this.albumsTxOps = albumsTxOps;
     }
 
     @GetMapping("/")
@@ -34,11 +44,17 @@ public class HomeController {
     @GetMapping("/setup")
     public String setup(Map<String, Object> model) {
         for (Movie movie : movieFixtures.load()) {
-            moviesBean.addMovie(movie);
+            Object execute = moviesTxOps.execute(transactionStatus -> {
+                moviesBean.addMovie(movie);
+                return null;
+            });
         }
 
         for (Album album : albumFixtures.load()) {
-            albumsBean.addAlbum(album);
+            albumsTxOps.execute(transactionStatus -> {
+                albumsBean.addAlbum(album);
+                return null;
+            });
         }
 
         model.put("movies", moviesBean.getMovies());
