@@ -28,6 +28,7 @@ public class MovieFixtures {
     }
 
     public List<Movie> load() {
+
         return readFromCsv(objectReader, "movie-fixtures.csv");
     }
 }

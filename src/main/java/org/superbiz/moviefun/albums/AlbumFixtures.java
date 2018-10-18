@@ -27,6 +27,7 @@ public class AlbumFixtures {
     }
 
     public List<Album> load() {
+
         return readFromCsv(objectReader, "album-fixtures.csv");
     }
 }
