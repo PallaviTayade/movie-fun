@@ -40,6 +40,8 @@ public class AlbumsUpdater {
     }
 
     public void update() throws IOException {
+
+
         Optional<Blob> maybeBlob = blobStore.get("albums.csv");
 
         if (!maybeBlob.isPresent()) {
