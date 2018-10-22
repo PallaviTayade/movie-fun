@@ -1,6 +1,8 @@
 package org.superbiz.moviefun.albums;
 
 import org.apache.tika.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -26,6 +28,8 @@ public class AlbumsController {
     private final AlbumsBean albumsBean;
     private final BlobStore blobStore;
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     public AlbumsController(AlbumsBean albumsBean, BlobStore blobStore) {
         this.albumsBean = albumsBean;
         this.blobStore = blobStore;
@@ -45,6 +49,7 @@ public class AlbumsController {
 
     @PostMapping("/{albumId}/cover")
     public String uploadCover(@PathVariable long albumId, @RequestParam("file") MultipartFile uploadedFile) throws IOException {
+        logger.debug("Uploading cover for album with id {}", albumId);
         saveUploadToFile(uploadedFile, getCoverFile(albumId));
 
         return format("redirect:/albums/%d", albumId);
@@ -64,10 +69,12 @@ public class AlbumsController {
 //    }
 
     private void saveUploadToFile(@RequestParam("file") MultipartFile uploadedFile, String targetFile) throws IOException {
-
-        Blob blob = new Blob (targetFile, uploadedFile.getInputStream(), uploadedFile.getContentType());
-        blobStore.put(blob);
-
+        try {
+            Blob blob = new Blob (targetFile, uploadedFile.getInputStream(), uploadedFile.getContentType());
+            blobStore.put(blob);
+        } catch (IOException e) {
+            logger.error("There was an error while uploading album cover", e);
+        }
     }
 
 //    @GetMapping("/{albumId}/cover")
